@@ -17,17 +17,21 @@ format/check: venv-dev
 migrations/check:
 	poetry run python src/manage.py makemigrations --check --dry-run
 
+tests: venv-dev
+	PYTHONPATH=src poetry run pytest src/tests
+
 docker/build:
 	docker build --no-cache	--tag=$(DOCKER_IMAGE) .
-
-docker/tests:
-	 docker run $(DOCKER_IMAGE) make tests
 
 docker/format/check:
 	 docker run $(DOCKER_IMAGE) /bin/sh -c 'make format/check'
 
 docker/migrations/check:
-	 docker run $(DOCKER_IMAGE) /bin/sh -c 'make migrations/check'
+	 docker run --env-file .env.local $(DOCKER_IMAGE) /bin/sh -c 'make migrations/check'
 
-tests: venv-dev
-	DJANGO_SETTINGS_MODULE=main.settings PYTHONPATH=src poetry run pytest src/tests
+docker/tests:
+	 docker compose up -d --force-recreate db django
+	 docker exec pure-django-1 make tests
+
+docker/run:
+	docker compose -f docker-compose.yml up --force-recreate -d --build
