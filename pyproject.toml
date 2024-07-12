@@ -8,11 +8,16 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 django = "^5.0.7"
+django-extensions = "^3.2.3"
+pillow = "^10.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.4.2"
-ruff = "^0.5.1"
+black = "*"
+ruff = "*"
+pytest = "*"
+pytest-django = "*"
+model-bakery = "*"
 
 [build-system]
 requires = ["poetry-core"]
@@ -42,3 +47,11 @@ lint.select = [
 lint.ignore = [
     "E501",
 ]
+exclude = ["migrations"]
+
+[tool.black]
+exclude = '''
+/(
+    migrations
+)/
+'''
