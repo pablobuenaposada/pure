@@ -1,5 +1,6 @@
 import pytest
 from chat.models import Chat, Message
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from model_bakery import baker
 
@@ -25,11 +26,12 @@ class TestMessage:
         with pytest.raises(ValidationError) as error:
             Message.objects.create()
 
-        assert list(error.value.error_dict.keys()) == ["chat", "text"]
+        assert list(error.value.error_dict.keys()) == ["chat", "text", "from_user"]
 
     def test_valid(self):
         chat = baker.make(Chat)
-        message = Message.objects.create(chat=chat, text="foo")
+        user = baker.make(User)
+        message = Message.objects.create(chat=chat, text="foo", from_user=user)
         expected = {
             "id": message.id,
             "created": message.created,
@@ -37,6 +39,7 @@ class TestMessage:
             "chat": chat,
             "text": message.text,
             "image": message.image,
+            "from_user": user,
         }
 
         for field in [field.name for field in Message._meta.get_fields()]:
