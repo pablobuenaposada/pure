@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "chat",
     "django_extensions",
+    "broadcaster",
 ]
 
 MIDDLEWARE = [

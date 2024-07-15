@@ -1,0 +1,2 @@
+class NoNewImageFound(Exception):
+    pass
