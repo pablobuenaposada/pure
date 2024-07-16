@@ -163,3 +163,4 @@ cython_debug/
 
 # pure specifics
 postgres-data/
+message_images/
