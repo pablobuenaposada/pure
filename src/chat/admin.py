@@ -38,13 +38,16 @@ class MessageInline(admin.TabularInline):
 class ChatAdmin(admin.ModelAdmin):
     fields = ["id", "user", "created", "modified"]
     readonly_fields = ["id", "created", "modified"]
-    list_display = ["id", "user"]
+    list_display = ["id", "user", "num_messages"]
     search_fields = ["id"]
     actions = ["send_banner_message"]
     inlines = [MessageInline]
 
     def send_banner_message(self, request, queryset):
         broadcast_banner_message(request.user)
+
+    def num_messages(self, instance):
+        return instance.messages.all().count()
 
 
 @admin.register(Message)
