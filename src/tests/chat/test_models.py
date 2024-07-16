@@ -41,34 +41,29 @@ class TestChat:
 @pytest.mark.django_db
 class TestMessage:
     def test_mandatory_fields(self):
-        """chat, from_user, and at least one of text or image are mandatory"""
+        """from_user, and at least one of text or image are mandatory"""
         with pytest.raises(ValidationError) as error:
             Message.objects.create()
 
-        assert set(error.value.error_dict.keys()) == {"chat", "from_user", "__all__"}
+        assert set(error.value.error_dict.keys()) == {"from_user", "__all__"}
 
     def test_either_text_or_image(self):
         """It's mandatory to send or a text or an image or both"""
-        chat = baker.make(Chat)
-        Message.objects.create(chat=chat, from_user=baker.make(User), text="foo")
-        Message.objects.create(chat=chat, from_user=baker.make(User), image="foo")
-        Message.objects.create(
-            chat=chat, from_user=baker.make(User), text="foo", image="foo"
-        )
+        Message.objects.create(from_user=baker.make(User), text="foo")
+        Message.objects.create(from_user=baker.make(User), image="foo")
+        Message.objects.create(from_user=baker.make(User), text="foo", image="foo")
 
     def test_valid(self):
-        chat = baker.make(Chat)
         user = baker.make(User)
-        message = Message.objects.create(chat=chat, text="foo", from_user=user)
+        message = Message.objects.create(text="foo", from_user=user)
         expected = {
             "id": message.id,
             "created": message.created,
             "modified": message.modified,
-            "chat": chat,
             "text": message.text,
             "image": message.image,
             "from_user": user,
         }
 
-        for field in [field.name for field in Message._meta.get_fields()]:
+        for field in {field.name for field in Message._meta.get_fields()} - {"chats"}:
             assert getattr(message, field) == expected[field]

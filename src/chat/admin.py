@@ -39,7 +39,7 @@ class ChatAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    fields = ["chat", "text", "image", "from_user"]
-    list_display = ["id", "chat", "from_user"]
-    search_fields = ["chat__id"]
-    autocomplete_fields = ["chat"]
+    fields = ["chats", "text", "image", "from_user"]
+    list_display = ["id", "from_user"]
+    search_fields = ["chats__id"]
+    autocomplete_fields = ["chats"]

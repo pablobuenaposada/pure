@@ -12,7 +12,7 @@ class Chat(TimeStampedModel):
 
 
 class Message(TimeStampedModel):
-    chat = models.ForeignKey(Chat, related_name="messages", on_delete=models.CASCADE)
+    chats = models.ManyToManyField(Chat, related_name="messages")
     text = models.TextField(blank=True)
     image = models.ImageField(upload_to="message_images/", blank=True, null=True)
     from_user = models.ForeignKey(User, on_delete=models.CASCADE)
