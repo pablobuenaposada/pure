@@ -41,10 +41,20 @@ class TestChat:
 @pytest.mark.django_db
 class TestMessage:
     def test_mandatory_fields(self):
+        """chat, from_user, and at least one of text or image are mandatory"""
         with pytest.raises(ValidationError) as error:
             Message.objects.create()
 
-        assert list(error.value.error_dict.keys()) == ["chat", "text", "from_user"]
+        assert set(error.value.error_dict.keys()) == {"chat", "from_user", "__all__"}
+
+    def test_either_text_or_image(self):
+        """It's mandatory to send or a text or an image or both"""
+        chat = baker.make(Chat)
+        Message.objects.create(chat=chat, from_user=baker.make(User), text="foo")
+        Message.objects.create(chat=chat, from_user=baker.make(User), image="foo")
+        Message.objects.create(
+            chat=chat, from_user=baker.make(User), text="foo", image="foo"
+        )
 
     def test_valid(self):
         chat = baker.make(Chat)
