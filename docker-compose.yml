@@ -28,14 +28,16 @@ services:
     env_file:
       - .env.local
     depends_on:
-      - django
+      db:
+        condition: service_healthy
   create-superuser:
     build: .
     command: python src/manage.py createsuperuser --noinput
     env_file:
       - .env.local
     depends_on:
-      - migration
+      migration:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:

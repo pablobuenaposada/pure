@@ -37,4 +37,4 @@ docker/run:
 	docker compose -f docker-compose.yml up --force-recreate -d --build
 
 docker/create-fake-chats:
-	 docker exec pure-django-1 poetry run python src/manage.py create_fake_chats --total=$(total)
+	 docker exec pure-django-1 python src/manage.py create_fake_chats --total=$(total)
