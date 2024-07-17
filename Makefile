@@ -18,7 +18,7 @@ migrations/check:
 	poetry run python src/manage.py makemigrations --check --dry-run
 
 tests: venv-dev
-	PYTHONPATH=src poetry run pytest src/tests
+	RQ_QUEUES_ASYNC=False PYTHONPATH=src poetry run pytest src/tests
 
 docker/build:
 	docker build --no-cache	--tag=$(DOCKER_IMAGE) .
@@ -30,7 +30,7 @@ docker/migrations/check:
 	 docker run --env-file .env.local $(DOCKER_IMAGE) /bin/sh -c 'make migrations/check'
 
 docker/tests:
-	 docker compose up -d --force-recreate db django
+	 docker compose up -d --force-recreate db django redis
 	 docker exec pure-django-1 make tests
 
 docker/run:

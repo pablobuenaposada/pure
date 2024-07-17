@@ -17,6 +17,7 @@ import environ
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False),
+    RQ_QUEUES_ASYNC=(bool, True),
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-v+6#p&$qsk*r*&1fg)=%m6x68k9-s6v=$@%0nx^-w(-9l9u!_p"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "chat",
     "django_extensions",
     "broadcaster",
+    "django_rq",
 ]
 
 MIDDLEWARE = [
@@ -135,3 +137,14 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+RQ_QUEUES = {
+    "default": {
+        "HOST": "redis",
+        "PORT": 6379,
+        "DB": 0,
+        "DEFAULT_TIMEOUT": 360,
+        "ASYNC": env("RQ_QUEUES_ASYNC"),  # we change this for unit tests basically
+    }
+}
+RQ_SHOW_ADMIN_LINK = True

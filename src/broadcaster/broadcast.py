@@ -1,11 +1,9 @@
 import requests
-from chat.models import Chat, Message
-from django.core.files.base import ContentFile
-from django.db import transaction
 
 from .constants import API_URL, PHOTOS_LIMIT
 from .exceptions import NoNewImageFound
 from .models import Image
+from .tasks import broadcast_image
 
 
 def broadcast_banner_message(user):
@@ -24,18 +22,9 @@ def broadcast_banner_message(user):
                 image_content = requests.get(url)
                 image_content.raise_for_status()
 
-                with transaction.atomic():
-                    # create the new broadcast message
-                    message = Message(from_user=user)
-                    message.image.save(
-                        url.split("/")[-1],
-                        ContentFile(image_content.content),
-                        save=True,
-                    )
-                    message.chats.set(Chat.objects.all())
-
-                    # store that this image has been already used
-                    Image.objects.create(url=url)
+                broadcast_image.delay(
+                    user, url, url.split("/")[-1], image_content.content
+                )
 
                 found = True
                 break
