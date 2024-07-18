@@ -6,7 +6,7 @@ from .models import Image
 from .tasks import broadcast_image
 
 
-def broadcast_banner_message(user):
+def broadcast_banner_message(user, message):
     offset = 0
     found = False
 
@@ -23,7 +23,7 @@ def broadcast_banner_message(user):
                 image_content.raise_for_status()
 
                 broadcast_image.delay(
-                    user, url, url.split("/")[-1], image_content.content
+                    user, message, url, url.split("/")[-1], image_content.content
                 )
 
                 found = True

@@ -10,6 +10,7 @@ from model_bakery import baker
 
 IMAGE_CONTENT = b"foo"
 IMAGE_URL = "http://images.com/1.png"
+MESSAGE_TEXT = "foo"
 
 
 @pytest.mark.django_db
@@ -42,10 +43,11 @@ class TestBroadcast:
         assert Image.objects.all().exists() is False
         assert Message.objects.all().exists() is False
 
-        broadcast_banner_message(self.user)
+        broadcast_banner_message(self.user, MESSAGE_TEXT)
 
         assert Image.objects.get().url == IMAGE_URL
         assert Message.objects.get(from_user=self.user).image.read() == IMAGE_CONTENT
+        assert Message.objects.get(from_user=self.user).text == MESSAGE_TEXT
 
     @patch("requests.get", new=patched_get)
     def test_broadcast_banner_message_no_new_image(self):
@@ -55,7 +57,7 @@ class TestBroadcast:
         assert Message.objects.all().exists() is False
 
         with pytest.raises(NoNewImageFound):
-            broadcast_banner_message(self.user)
+            broadcast_banner_message(self.user, MESSAGE_TEXT)
 
         assert Image.objects.count() == 1
         assert Message.objects.all().exists() is False

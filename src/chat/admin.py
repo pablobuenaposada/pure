@@ -1,8 +1,10 @@
 from broadcaster.broadcast import broadcast_banner_message
 from django.contrib import admin
+from django.shortcuts import render
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
+from .forms import BannerMessageForm
 from .models import Chat, Message
 
 
@@ -44,10 +46,17 @@ class ChatAdmin(admin.ModelAdmin):
     inlines = [MessageInline]
 
     def send_banner_message(self, request, queryset):
-        broadcast_banner_message(request.user)
+        if "message" in request.POST:
+            broadcast_banner_message(request.user, request.POST["message"])
+        else:
+            return render(
+                request,
+                "admin/send_banner_message.html",
+                {"form": BannerMessageForm(), "chat": queryset.first()},
+            )
 
     def num_messages(self, instance):
-        return instance.messages.all().count()
+        return instance.messages.count()
 
 
 @admin.register(Message)
@@ -65,6 +74,6 @@ class MessageAdmin(admin.ModelAdmin):
         """
         return (
             format_html('<span style="color: green;">&#10004;</span>')
-            if instance.chats.all().count() > 1
+            if instance.chats.count() > 1
             else format_html('<span style="color: red;">&#10008;</span>')
         )
