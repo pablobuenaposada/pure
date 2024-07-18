@@ -31,10 +31,10 @@ docker/migrations/check:
 
 docker/tests:
 	 docker compose up -d --force-recreate db django redis
-	 docker exec pure-django-1 make tests
+	 docker exec $(DOCKER_IMAGE)-django-1 make tests
 
 docker/run:
 	docker compose -f docker-compose.yml up --force-recreate -d --build
 
 docker/create-fake-chats:
-	 docker exec pure-django-1 python src/manage.py create_fake_chats --total=$(total)
+	 docker exec $(DOCKER_IMAGE)-django-1 python src/manage.py create_fake_chats --total=$(total)

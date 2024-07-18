@@ -49,13 +49,13 @@ class ChatAdmin(admin.ModelAdmin):
 
     def send_banner_message(self, request, queryset):
         if "message" in request.POST:
-            # If the message is in the payload, we came from the form
+            # if the message is in the payload, we came from the form
             form = BannerMessageForm(request.POST)
             if form.is_valid():
                 try:
                     broadcast_banner_message(request.user, request.POST["message"])
                 except NoNewImageFound:
-                    # Add the validation error to the form
+                    # add the validation error to the form
                     form.add_error(
                         None,
                         ValidationError(
@@ -68,7 +68,7 @@ class ChatAdmin(admin.ModelAdmin):
                         {"form": form, "chat": queryset.first()},
                     )
         else:
-            # The first time clicking the action, we show a form asking for the text message
+            # the first time clicking the action, we show a form asking for the text message
             return render(
                 request,
                 "admin/send_banner_message.html",

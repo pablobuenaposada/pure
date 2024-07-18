@@ -7,6 +7,10 @@ from django_rq import job
 
 @job
 def broadcast_image(from_user, message, url, filename, image_content):
+    """
+    Creates a broadcast Message with an image and a text,
+    the image url used will be kept, so it cannot be used again.
+    """
     with transaction.atomic():
         # create the new broadcast message
         message = Message(from_user=from_user, text=message)

@@ -7,6 +7,7 @@ from .tasks import broadcast_image
 
 
 def broadcast_banner_message(user, message):
+    """Fetches a new image from the API and sends a new broadcast message with it"""
     offset = 0
     found = False
 
@@ -22,6 +23,7 @@ def broadcast_banner_message(user, message):
                 image_content = requests.get(url)
                 image_content.raise_for_status()
 
+                # async creation of the message
                 broadcast_image.delay(
                     user, message, url, url.split("/")[-1], image_content.content
                 )
@@ -33,5 +35,5 @@ def broadcast_banner_message(user, message):
             # if we can go for the next offset
             if offset + 1 <= images["total_photos"] / PHOTOS_LIMIT:
                 offset += 1
-            else:  # this means we know there's no photos we can use
+            else:  # this means we know there's no more photos we can use
                 raise NoNewImageFound
