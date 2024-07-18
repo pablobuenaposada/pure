@@ -1,5 +1,7 @@
 from broadcaster.broadcast import broadcast_banner_message
+from broadcaster.exceptions import NoNewImageFound
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.shortcuts import render
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
@@ -47,10 +49,26 @@ class ChatAdmin(admin.ModelAdmin):
 
     def send_banner_message(self, request, queryset):
         if "message" in request.POST:
-            # if the message is in the payload means we came from the form
-            broadcast_banner_message(request.user, request.POST["message"])
+            # If the message is in the payload, we came from the form
+            form = BannerMessageForm(request.POST)
+            if form.is_valid():
+                try:
+                    broadcast_banner_message(request.user, request.POST["message"])
+                except NoNewImageFound:
+                    # Add the validation error to the form
+                    form.add_error(
+                        None,
+                        ValidationError(
+                            "No new image that could be used found in the API"
+                        ),
+                    )
+                    return render(
+                        request,
+                        "admin/send_banner_message.html",
+                        {"form": form, "chat": queryset.first()},
+                    )
         else:
-            # the first time clicking the action we show a form asking for the text message
+            # The first time clicking the action, we show a form asking for the text message
             return render(
                 request,
                 "admin/send_banner_message.html",
