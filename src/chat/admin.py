@@ -47,8 +47,10 @@ class ChatAdmin(admin.ModelAdmin):
 
     def send_banner_message(self, request, queryset):
         if "message" in request.POST:
+            # if the message is in the payload means we came from the form
             broadcast_banner_message(request.user, request.POST["message"])
         else:
+            # the first time clicking the action we show a form asking for the text message
             return render(
                 request,
                 "admin/send_banner_message.html",
